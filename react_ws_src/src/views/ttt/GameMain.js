@@ -31,7 +31,8 @@ export default class SetName extends Component {
 				cell_vals: {},
 				next_turn_ply: true,
 				game_play: true,
-				game_stat: 'Start game'
+				game_stat: 'Start game',
+				opp_name: 'Computer'
 			}
 		else {
 			this.sock_start()
@@ -40,7 +41,8 @@ export default class SetName extends Component {
 				cell_vals: {},
 				next_turn_ply: true,
 				game_play: false,
-				game_stat: 'Connecting'
+				game_stat: 'Connecting',
+				opp_name: ''
 			}
 		}
 	}
@@ -72,7 +74,8 @@ export default class SetName extends Component {
 			this.setState({
 				next_turn_ply: data.mode=='m',
 				game_play: true,
-				game_stat: 'Playing with ' + data.opp.name
+				game_stat: 'Playing with ' + data.opp.name,
+				opp_name: data.opp.name
 			})
 
 		}.bind(this));
@@ -309,6 +312,28 @@ export default class SetName extends Component {
 				game_play: false
 			})
 
+			// only notify server if player won on own turn
+			if (this.props.game_type === 'live' && this.state.next_turn_ply) {
+				console.log('notifying server of win')
+				this.socket && this.socket.emit('game_over', {
+					result: 'win', 
+					winner_player: cell_vals[set[0]]=='x' 
+						? app.settings.curr_user.name 
+						: this.state.opp_name
+					})
+			} else if (this.props.game_type !== 'live' ) {
+
+				app.settings.leaderboard.push({
+					name: app.settings.curr_user.name,
+					opponent: this.state.opp_name,
+					winner: cell_vals[set[0]]=='x' 
+						? app.settings.curr_user.name 
+						: this.state.opp_name,
+					game: 'X-ttt',
+					date: new Date().toLocaleString()
+				})
+			}
+
 			this.socket && this.socket.disconnect();
 
 		} else if (fin) {
@@ -318,7 +343,24 @@ export default class SetName extends Component {
 				game_play: false
 			})
 
+			// only notify server if player drew on own turn
+			if (this.props.game_type === 'live' && this.state.next_turn_ply) {
+				this.socket && this.socket.emit('game_over', {
+					result: 'draw', 
+					})
+			} else if (this.props.game_type !== 'live' ) {
+				app.settings.leaderboard.push({
+					name: app.settings.curr_user.name,
+					opponent: this.state.opp_name,
+					winner: 'Draw',
+					game: 'X-ttt',
+					date: new Date().toLocaleString()
+				})
+			}
+
 			this.socket && this.socket.disconnect();
+
+			
 
 		} else {
 			this.props.game_type!='live' && this.state.next_turn_ply && setTimeout(this.turn_comp.bind(this), rand_to_fro(500, 1000));

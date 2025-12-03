@@ -13,6 +13,8 @@ Player = require("./Player").Player;			// Player class
 players = [];									// Array of connected players
 players_avail = [];
 
+leader_board = [];								// Leader board array
+
 
 var port = process.env.PORT || 3001;
 
@@ -22,6 +24,10 @@ server.listen(port, function () {
 
 // Routing
 app.use(express.static(__dirname + '/public'));
+
+app.get('/leader-board', function (req, res) {
+	res.json(leader_board);
+});
 
 require('./XtttGame.js');
 
