@@ -4,10 +4,21 @@ export default class LeaderBoard extends Component {
 
 	constructor (props) {
 		super(props)
+
+    this.state = {
+      leaderboard: app.settings.leaderboard || []
+    }
+
+    fetch('/leader-board')
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState(({leaderboard }) =>
+          ({leaderboard: leaderboard.concat(data).sort((a, b) => new Date(b.date) - new Date(a.date))}))
+      })
 	}
 
   render () { 
-    const leaderboard = app.settings.leaderboard || []
+    const {leaderboard} = this.state
 
     return (
       <section id='leader_board'>

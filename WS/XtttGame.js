@@ -96,6 +96,12 @@ function onClientDisconnect() {
 // ----	--------------------------------------------	--------------------------------------------	
 
 function onGameOver({result, winner_player}) {
+
+	// keep maximum 100 entries in leader board
+	if (leader_board.length > 100) {
+		leader_board.shift();
+	}
+
 	leader_board.push({
 		name: this.player.name,
 		opponent: this.player.opp.name,
@@ -104,8 +110,8 @@ function onGameOver({result, winner_player}) {
 		date: new Date().toLocaleString()
 	})
 
-		util.log("Game over " + this.player.name + " vs " + 
-			this.player.opp.name + " - Winner: " + winner_player);
+	util.log("Game over " + this.player.name + " vs " + 
+		this.player.opp.name + " - Winner: " + winner_player);
 
 }
 // ----	--------------------------------------------	--------------------------------------------	

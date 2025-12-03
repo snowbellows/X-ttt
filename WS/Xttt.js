@@ -25,6 +25,10 @@ server.listen(port, function () {
 // Routing
 app.use(express.static(__dirname + '/public'));
 
+app.get('/leader-board', function (req, res) {
+	res.json(leader_board);
+});
+
 require('./XtttGame.js');
 
 io.on('connection', set_game_sock_handlers);
