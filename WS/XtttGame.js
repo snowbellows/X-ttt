@@ -95,6 +95,19 @@ function onClientDisconnect() {
 // ----	--------------------------------------------	--------------------------------------------	
 // ----	--------------------------------------------	--------------------------------------------	
 
+function onGameOver({result, winner_player}) {
+	leader_board.push({
+		name: this.player.name,
+		opponent: this.player.opp.name,
+		winner: result === "draw" ? "Draw" : winner_player,
+		game: "X-ttt",
+		date: new Date().toLocaleString()
+	})
+
+		util.log("Game over " + this.player.name + " vs " + 
+			this.player.opp.name + " - Winner: " + winner_player);
+
+}
 // ----	--------------------------------------------	--------------------------------------------	
 // ----	--------------------------------------------	--------------------------------------------	
 
@@ -107,5 +120,7 @@ set_game_sock_handlers = function (socket) {
 	socket.on("ply_turn", onTurn);
 
 	socket.on("disconnect", onClientDisconnect);
+	
+	socket.on("game_over", onGameOver);
 
 };

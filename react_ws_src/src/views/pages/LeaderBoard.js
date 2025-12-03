@@ -18,17 +18,17 @@ export default class LeaderBoard extends Component {
               <tr>
                 <th>Name</th>
                 <th>Opponent</th>
-                <th>Result</th>
+                <th>Winner</th>
                 <th>Game</th>
                 <th>Date</th>
               </tr>
             </thead>
             <tbody>
-              {leaderboard.map((entry, index) => (
-                <tr key={index}>
+              {leaderboard.map((entry) => (
+                <tr key={entry.name + entry.opponent + entry.date}>
                   <td className=''>{entry.name}</td>
                   <td>{entry.opponent}</td>
-                  <td>{entry.result}</td>
+                  <td>{entry.winner}</td>
                   <td>{entry.game}</td>
                   <td>{entry.date}</td>
                 </tr>

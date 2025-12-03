@@ -312,15 +312,29 @@ export default class SetName extends Component {
 				game_play: false
 			})
 
-			this.socket && this.socket.disconnect();
+			// only notify server if player won on own turn
+			if (this.props.game_type === 'live' && this.state.next_turn_ply) {
+				console.log('notifying server of win')
+				this.socket && this.socket.emit('game_over', {
+					result: 'win', 
+					winner_player: cell_vals[set[0]]=='x' 
+						? app.settings.curr_user.name 
+						: this.state.opp_name
+					})
+			} else if (this.props.game_type !== 'live' ) {
 
-			app.settings.leaderboard.push({
-				name: app.settings.curr_user.name,
-				opponent: this.state.opp_name,
-				result: cell_vals[set[0]]=='x'? 'Win' : 'Lose',
-				game: 'Tic Tac Toe',
-				date: new Date().toLocaleString()
-			})
+				app.settings.leaderboard.push({
+					name: app.settings.curr_user.name,
+					opponent: this.state.opp_name,
+					winner: cell_vals[set[0]]=='x' 
+						? app.settings.curr_user.name 
+						: this.state.opp_name,
+					game: 'X-ttt',
+					date: new Date().toLocaleString()
+				})
+			}
+
+			this.socket && this.socket.disconnect();
 
 		} else if (fin) {
 		
@@ -329,15 +343,24 @@ export default class SetName extends Component {
 				game_play: false
 			})
 
+			// only notify server if player drew on own turn
+			if (this.props.game_type === 'live' && this.state.next_turn_ply) {
+				this.socket && this.socket.emit('game_over', {
+					result: 'draw', 
+					})
+			} else if (this.props.game_type !== 'live' ) {
+				app.settings.leaderboard.push({
+					name: app.settings.curr_user.name,
+					opponent: this.state.opp_name,
+					winner: 'Draw',
+					game: 'X-ttt',
+					date: new Date().toLocaleString()
+				})
+			}
+
 			this.socket && this.socket.disconnect();
 
-			app.settings.leaderboard.push({
-				name: app.settings.curr_user.name,
-				opponent: this.state.opp_name,
-				result: 'Draw',
-				game: 'Tic Tac Toe',
-				date: new Date().toLocaleString()
-			})
+			
 
 		} else {
 			this.props.game_type!='live' && this.state.next_turn_ply && setTimeout(this.turn_comp.bind(this), rand_to_fro(500, 1000));
